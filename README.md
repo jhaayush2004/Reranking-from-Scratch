@@ -31,5 +31,65 @@ In a typical search engine scenario:
 
 - **1. Initial Retrieval**: A search query is used to retrieve a set of top N documents from the entire corpus using a fast, efficient method (e.g., BM25, TF-IDF).
 - **2. Flash Re-ranking**: The top N documents are then re-ranked using a more sophisticated method (e.g., neural re-ranking models, BERT-based models) to better match the user's intent and the semantic meaning of the query.
+
+# Using Google cloud for Lunning Model
+Running the Model
+The code provided does not run the model on your local machine. Instead, it sends requests to Google's cloud infrastructure where the actual model resides and runs. Here’s why:
+
+- **API Configuration**: By configuring the API key with genai.configure(api_key=GOOGLE_API_KEY), you are setting up authentication for making requests to Google's cloud services.
+- **Model Instantiation**: The GenerativeModel instance created is a client-side representation that allows you to send requests to the model hosted in the cloud. It does not download or run the model locally.
+## How It Works
+- **Request**: When you use this model to generate text or perform other tasks, your code sends a request to Google's cloud servers.
+- **Processing**: Google's infrastructure processes the request using the gemini-1.5-pro model.
+- **Response**: The results are sent back to your application via the API.
+## Example Usage
+Here is an example of how you might use this setup to generate text:
+
+```python
+
+import google.generativeai as genai
+import os
+
+# Configure the API key
+genai.configure(api_key=GOOGLE_API_KEY)
+
+# Instantiate the model
+model = genai.GenerativeModel('gemini-1.5-pro')
+
+# Generate text using the model
+response = model.generate(prompt="Once upon a time")
+print(response['generated_text'])
+```
+# AutoConfig
+## Key Points
+- **Loading Configuration**:
+
+```python
+
+config = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
+```
+- **Modifying Configuration Parameters**:
+
+### Changing the number of labels:
+```python
+
+config.num_labels = 5
+```
+### Adjusting the dropout rate:
+```python
+
+config.hidden_dropout_prob = 0.3
+```
+
+### Instantiating with Modified Configuration:
+
+```python
+
+tokenizer = AutoTokenizer.from_pretrained(model_name, config=config, trust_remote_code=True)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, config=config, trust_remote_code=True)
+```
+## Conclusion
+By modifying the configuration parameters, users can adapt pre-trained models to new tasks or specific requirements of their experiments. This flexibility allows for efficient customization without the need to train models from scratch.
+
 ### Do Visit 
 - [Cohere Reference for Reranking](https://docs.cohere.com/reference/rerank)
